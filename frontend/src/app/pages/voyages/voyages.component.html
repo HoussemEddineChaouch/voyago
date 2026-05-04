@@ -1,0 +1,72 @@
+<app-navbar />
+
+<div class="max-w-7xl mx-auto px-6 py-10">
+  <h1 class="text-4xl font-extrabold text-dark mb-1">All voyages</h1>
+  <p class="text-gray-400 mb-8">{{ total() }} curated trips ready to book</p>
+
+  <div class="flex gap-8">
+    <!-- Sidebar Filters -->
+    <aside class="w-44 shrink-0 hidden md:block">
+      <h3 class="font-semibold text-sm mb-3">Destination</h3>
+      <ul class="space-y-1 text-sm mb-6">
+        <li>
+          <button
+            (click)="selectDest('')"
+            [class.text-primary]="selectedDest() === ''"
+            [class.font-semibold]="selectedDest() === ''"
+            class="w-full text-left px-2 py-1 rounded-lg hover:bg-gray-50 text-gray-600"
+          >
+            All destinations
+          </button>
+        </li>
+        @for (d of destinations(); track d._id) {
+          <li>
+            <button
+              (click)="selectDest(d._id)"
+              [class.text-primary]="selectedDest() === d._id"
+              [class.font-semibold]="selectedDest() === d._id"
+              class="w-full text-left px-2 py-1 rounded-lg hover:bg-gray-50 text-gray-600"
+            >
+              {{ d.name }}
+            </button>
+          </li>
+        }
+      </ul>
+
+      <h3 class="font-semibold text-sm mb-2">Max price</h3>
+      <input
+        type="range"
+        min="500"
+        max="5000"
+        step="50"
+        [(ngModel)]="maxPrice"
+        (change)="load()"
+        class="w-full accent-primary mb-1"
+      />
+      <p class="text-xs text-gray-500">Up to ${{ maxPrice() | number }}</p>
+
+      <h3 class="font-semibold text-sm mt-5 mb-2">When</h3>
+      <input
+        type="date"
+        [(ngModel)]="date"
+        (change)="load()"
+        class="input text-xs"
+      />
+    </aside>
+
+    <!-- Grid -->
+    <div class="flex-1">
+      @if (loading()) {
+        <div class="text-center py-20 text-gray-400">Loading...</div>
+      } @else {
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          @for (v of voyages(); track v._id) {
+            <app-voyage-card [voyage]="v" />
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>
+
+<app-footer />

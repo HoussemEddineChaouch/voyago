@@ -1,0 +1,128 @@
+<app-navbar />
+
+<div
+  class="min-h-[80vh] flex flex-col items-center justify-center bg-gradient-to-b from-slate-50 to-white px-4 py-16"
+>
+  <!-- Logo mark -->
+
+  @if (tab() !== "otp") {
+    <h1 class="text-2xl font-bold text-dark mb-1">
+      Welcome to <span class="text-primary">Voyago</span>
+    </h1>
+    <p class="text-gray-400 text-sm mb-8">Your next adventure starts here</p>
+
+    <div class="card w-full max-w-sm p-6">
+      <!-- Tabs -->
+      <div class="flex bg-gray-100 rounded-xl p-1 mb-6">
+        <button
+          (click)="tab.set('signin')"
+          [class.bg-white]="tab() === 'signin'"
+          [class.shadow-sm]="tab() === 'signin'"
+          class="flex-1 py-2 text-sm font-medium rounded-lg transition"
+        >
+          Sign In
+        </button>
+        <button
+          (click)="tab.set('signup')"
+          [class.bg-white]="tab() === 'signup'"
+          [class.shadow-sm]="tab() === 'signup'"
+          class="flex-1 py-2 text-sm font-medium rounded-lg transition"
+        >
+          Sign Up
+        </button>
+      </div>
+
+      @if (error()) {
+        <p class="text-red-500 text-sm mb-4 bg-red-50 px-3 py-2 rounded-lg">
+          {{ error() }}
+        </p>
+      }
+
+      @if (tab() === "signup") {
+        <label class="block text-xs font-semibold mb-1">Name</label>
+        <input
+          [(ngModel)]="name"
+          type="text"
+          placeholder="Your full name"
+          class="input mb-3"
+        />
+      }
+
+      <label class="block text-xs font-semibold mb-1">Email</label>
+      <input
+        [(ngModel)]="email"
+        type="email"
+        placeholder="you@example.com"
+        class="input mb-3"
+      />
+
+      <div class="flex items-center justify-between mb-1">
+        <label class="text-xs font-semibold">Password</label>
+        @if (tab() === "signin") {
+          <a
+            routerLink="/forgot-password"
+            class="text-xs text-primary hover:underline"
+            >Forgot?</a
+          >
+        }
+      </div>
+      <input [(ngModel)]="password" type="password" class="input mb-5" />
+
+      @if (tab() === "signin") {
+        <button
+          (click)="login()"
+          [disabled]="loading()"
+          class="btn-primary w-full text-center"
+        >
+          {{ loading() ? "Signing in..." : "Sign In" }}
+        </button>
+      } @else {
+        <button
+          (click)="register()"
+          [disabled]="loading()"
+          class="btn-primary w-full text-center"
+        >
+          {{ loading() ? "Creating account..." : "Create account" }}
+        </button>
+      }
+    </div>
+
+    <p class="text-xs text-gray-400 mt-4">
+      By continuing you agree to our <a href="#" class="underline">Terms</a> and
+      <a href="#" class="underline">Privacy Policy</a>.
+    </p>
+  }
+
+  <!-- OTP Verification -->
+  @if (tab() === "otp") {
+    <h1 class="text-2xl font-bold text-dark mb-1">Verify your email</h1>
+    <p class="text-gray-400 text-sm mb-8">
+      Enter the 6-digit code sent to {{ pendingEmail() }}
+    </p>
+
+    <div class="card w-full max-w-sm p-6">
+      @if (error()) {
+        <p class="text-red-500 text-sm mb-4 bg-red-50 px-3 py-2 rounded-lg">
+          {{ error() }}
+        </p>
+      }
+      <label class="block text-xs font-semibold mb-1">Verification code</label>
+      <input
+        [(ngModel)]="otp"
+        type="text"
+        maxlength="6"
+        placeholder="123456"
+        class="input mb-5 text-center text-2xl tracking-widest font-bold"
+      />
+      <button
+        (click)="verifyOTP()"
+        [disabled]="loading()"
+        class="btn-primary w-full text-center"
+      >
+        {{ loading() ? "Verifying..." : "Verify" }}
+      </button>
+    </div>
+  }
+</div>
+
+<app-footer />

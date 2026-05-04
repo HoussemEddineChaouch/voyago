@@ -1,0 +1,144 @@
+<app-navbar />
+
+<div class="max-w-3xl mx-auto px-6 py-10">
+  <a
+    [routerLink]="backUrl"
+    class="text-sm text-gray-500 flex items-center gap-1 hover:text-dark mb-8"
+  >
+    Back
+  </a>
+
+  @if (loading()) {
+    <p class="text-gray-400">Loading...</p>
+  }
+
+  @if (!loading() && !booking()) {
+    <div class="card p-12 text-center">
+      <p class="text-gray-400">Booking not found.</p>
+    </div>
+  }
+
+  @if (booking(); as b) {
+    <!-- Hero image -->
+    <div class="rounded-2xl overflow-hidden h-56 mb-6">
+      <img
+        [src]="imageUrl"
+        [alt]="voyageTitle()"
+        class="w-full h-full object-cover"
+      />
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Left: Trip info -->
+      <div class="card p-6">
+        <h2 class="font-bold text-dark text-lg mb-4">Trip details</h2>
+        <div class="space-y-3 text-sm">
+          <div class="flex justify-between">
+            <span class="text-gray-400">Destination</span>
+            <span class="font-medium text-dark">{{ destName() }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-400">Voyage</span>
+            <span class="font-medium text-dark">{{ voyageTitle() }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-400">Duration</span>
+            <span class="font-medium text-dark"
+              >{{ voyageDuration() }} days</span
+            >
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-400">Departure</span>
+            <span class="font-medium text-dark">
+              {{ b.departureDate | date: "MMM d, yyyy" }}
+            </span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-400">Travelers</span>
+            <span class="font-medium text-dark">{{ b.travelers }}</span>
+          </div>
+          @if (b.phone) {
+            <div class="flex justify-between">
+              <span class="text-gray-400">Phone</span>
+              <span class="font-medium text-dark">{{ b.phone }}</span>
+            </div>
+          }
+          @if (b.specialRequests) {
+            <div class="flex justify-between">
+              <span class="text-gray-400">Requests</span>
+              <span class="font-medium text-dark text-right max-w-[60%]">{{
+                b.specialRequests
+              }}</span>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Right: Payment info -->
+      <div class="card p-6">
+        <h2 class="font-bold text-dark text-lg mb-4">Payment</h2>
+        <div class="space-y-3 text-sm">
+          <div class="flex justify-between">
+            <span class="text-gray-400">Status</span>
+            <span
+              class="text-xs font-semibold px-2 py-1 rounded-full"
+              [ngClass]="statusClass(b.status)"
+            >
+              {{ b.status | lowercase }}
+            </span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-400">Price/person</span>
+            <span class="font-medium text-dark"
+              >${{ voyagePrice() | number }}</span
+            >
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-400">Travelers</span>
+            <span class="font-medium text-dark">× {{ b.travelers }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-400">Service fee</span>
+            <span class="font-medium text-dark"
+              >${{ b.serviceFee | number }}</span
+            >
+          </div>
+          <div class="flex justify-between font-bold text-dark border-t pt-3">
+            <span>Total</span>
+            <span>${{ b.totalPrice | number }}</span>
+          </div>
+          @if (b.paymentIntentId) {
+            <div class="border-t pt-3">
+              <span class="text-gray-400 block mb-1">Payment ID</span>
+              <span class="font-mono text-xs text-gray-500 break-all">
+                {{ b.paymentIntentId }}
+              </span>
+            </div>
+          }
+        </div>
+
+        <!-- Admin: customer info -->
+        @if (auth.isAdmin()) {
+          <div class="border-t mt-4 pt-4 space-y-2 text-sm">
+            <h3 class="font-semibold text-dark mb-2">Customer</h3>
+            <div class="flex justify-between">
+              <span class="text-gray-400">Name</span>
+              <span class="font-medium text-dark">{{ userName() }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-400">Email</span>
+              <span class="font-medium text-dark">{{ userEmail() }}</span>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Booked on -->
+    <p class="text-xs text-gray-400 text-center mt-6">
+      Booked on {{ b.createdAt | date: "MMMM d, yyyy · h:mm a" }}
+    </p>
+  }
+</div>
+
+<app-footer />

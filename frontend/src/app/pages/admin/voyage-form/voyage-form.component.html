@@ -1,0 +1,258 @@
+<app-navbar />
+
+<div class="max-w-3xl mx-auto px-6 py-10">
+  <!-- Back -->
+  <a
+    routerLink="/admin"
+    [queryParams]="{ tab: 'voyages' }"
+    class="text-sm text-gray-500 flex items-center gap-1 hover:text-dark mb-6"
+  >
+    Back to admin
+  </a>
+
+  <h1 class="text-3xl font-extrabold text-dark mb-1">
+    {{ isEdit() ? "Edit voyage" : "New voyage" }}
+  </h1>
+  <p class="text-gray-400 mb-8">
+    {{
+      isEdit()
+        ? "Update trip details"
+        : "Fill in the details to create a new trip"
+    }}
+  </p>
+
+  @if (loading()) {
+    <p class="text-gray-400">Loading...</p>
+  } @else {
+    <div class="card p-8 space-y-6">
+      @if (error()) {
+        <p class="text-red-500 text-sm bg-red-50 px-4 py-2 rounded-xl">
+          {{ error() }}
+        </p>
+      }
+
+      <!-- Image Upload -->
+      <div>
+        <label class="block text-sm font-semibold mb-2">Cover image</label>
+        <div
+          class="border-2 border-dashed border-gray-200 rounded-2xl overflow-hidden"
+        >
+          @if (currentImageUrl) {
+            <div class="relative">
+              <img
+                [src]="currentImageUrl"
+                alt="preview"
+                class="w-full h-52 object-cover"
+              />
+              <label
+                class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition cursor-pointer"
+              >
+                <span class="text-white text-sm font-medium">Change image</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  (change)="onFileChange($event)"
+                  class="hidden"
+                />
+              </label>
+            </div>
+          } @else {
+            <label
+              class="flex flex-col items-center justify-center h-48 cursor-pointer hover:bg-gray-50 transition"
+            >
+              <svg
+                class="w-10 h-10 text-gray-300 mb-3"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.5"
+                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                />
+              </svg>
+              <span class="text-sm text-gray-400">Click to upload image</span>
+              <input
+                type="file"
+                accept="image/*"
+                (change)="onFileChange($event)"
+                class="hidden"
+              />
+            </label>
+          }
+        </div>
+      </div>
+
+      <!-- Title + Slug -->
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-semibold mb-1"
+            >Title <span class="text-red-400">*</span></label
+          >
+          <input
+            [(ngModel)]="title"
+            (blur)="autoSlug()"
+            type="text"
+            placeholder="Santorini Sunset Escape"
+            class="input"
+          />
+        </div>
+        <div>
+          <label class="block text-sm font-semibold mb-1"
+            >Slug <span class="text-red-400">*</span></label
+          >
+          <input
+            [(ngModel)]="slug"
+            type="text"
+            placeholder="santorini-sunset-escape"
+            class="input"
+          />
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div>
+        <label class="block text-sm font-semibold mb-1">Description</label>
+        <textarea
+          [(ngModel)]="description"
+          rows="4"
+          class="input resize-none"
+          placeholder="Describe this voyage..."
+        ></textarea>
+      </div>
+
+      <!-- Price / Duration / Date -->
+      <div class="grid grid-cols-3 gap-4">
+        <div>
+          <label class="block text-sm font-semibold mb-1"
+            >Price (USD) <span class="text-red-400">*</span></label
+          >
+          <input
+            [(ngModel)]="price"
+            type="number"
+            placeholder="1480"
+            class="input"
+          />
+        </div>
+        <div>
+          <label class="block text-sm font-semibold mb-1"
+            >Duration (days) <span class="text-red-400">*</span></label
+          >
+          <input
+            [(ngModel)]="duration"
+            type="number"
+            placeholder="7"
+            class="input"
+          />
+        </div>
+        <div>
+          <label class="block text-sm font-semibold mb-1">Departure date</label>
+          <input [(ngModel)]="date" type="date" class="input" />
+        </div>
+      </div>
+
+      <!-- Destination / Spots / Rating / Reviews -->
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-semibold mb-1"
+            >Destination <span class="text-red-400">*</span></label
+          >
+          <select [(ngModel)]="destinationId" class="input">
+            <option value="">Select destination</option>
+            @for (d of destinations(); track d._id) {
+              <option [value]="d._id">{{ d.name }}</option>
+            }
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold mb-1">Spots left</label>
+          <input
+            [(ngModel)]="spotsLeft"
+            type="number"
+            placeholder="10"
+            class="input"
+          />
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-semibold mb-1">Rating (0–5)</label>
+          <input
+            [(ngModel)]="rating"
+            type="number"
+            step="0.1"
+            min="0"
+            max="5"
+            placeholder="4.9"
+            class="input"
+          />
+        </div>
+        <div>
+          <label class="block text-sm font-semibold mb-1">Review count</label>
+          <input
+            [(ngModel)]="reviewCount"
+            type="number"
+            placeholder="312"
+            class="input"
+          />
+        </div>
+      </div>
+
+      <!-- Includes (comma-separated) -->
+      <div>
+        <label class="block text-sm font-semibold mb-1"
+          >What's included
+          <span class="text-xs font-normal text-gray-400"
+            >(comma-separated)</span
+          ></label
+        >
+        <input
+          [(ngModel)]="includes"
+          type="text"
+          class="input"
+          placeholder="Caldera-view suite, Private catamaran cruise, Wine tasting"
+        />
+      </div>
+
+      <!-- Featured toggle -->
+      <div class="flex items-center gap-3">
+        <label class="relative inline-flex items-center cursor-pointer">
+          <input type="checkbox" [(ngModel)]="featured" class="sr-only peer" />
+          <div
+            class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-primary after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"
+          ></div>
+        </label>
+        <span class="text-sm font-medium text-dark">Featured voyage</span>
+      </div>
+
+      <!-- Submit -->
+      <div class="flex gap-3 pt-2">
+        <button
+          (click)="submit()"
+          [disabled]="saving()"
+          class="btn-primary flex-1 py-3 text-base"
+        >
+          {{
+            saving()
+              ? "Saving..."
+              : isEdit()
+                ? "Update voyage"
+                : "Create voyage"
+          }}
+        </button>
+        <a
+          routerLink="/admin"
+          [queryParams]="{ tab: 'voyages' }"
+          class="btn-outline flex-1 py-3 text-base text-center"
+        >
+          Cancel
+        </a>
+      </div>
+    </div>
+  }
+</div>
+
+<app-footer />

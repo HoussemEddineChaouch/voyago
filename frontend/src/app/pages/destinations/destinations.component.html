@@ -1,0 +1,14 @@
+<app-navbar />
+
+<div class="max-w-7xl mx-auto px-6 py-10">
+  <h1 class="text-4xl font-extrabold text-dark mb-1">Destinations</h1>
+  <p class="text-gray-400 mb-8">Find your next favorite place</p>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+    @for (d of destinations(); track d._id) {
+      <app-destination-card [destination]="d" />
+    }
+  </div>
+</div>
+
+<app-footer />
